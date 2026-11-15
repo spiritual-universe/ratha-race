@@ -4,243 +4,330 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>RATHA RACE - Ancient Bharat</title>
+<title>RATHA RACE | Ancient Bharat 3D</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#170e09;color:#ffe2a2;font-family:Georgia,serif;overflow:hidden}
-canvas{display:block;width:100vw;height:100dvh}
-#hud{position:fixed;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;gap:5px}
-.stat{background:#211309dd;border:1px solid #bd914b;padding:8px;border-radius:9px;text-align:center;font:12px Arial}
-.stat b{display:block;font-size:17px;color:#ffdb8c;margin-top:4px}
-#menu{position:fixed;inset:0;background:#130b08eF;display:flex;align-items:center;justify-content:center;padding:18px}
-.card{width:min(420px,100%);background:linear-gradient(145deg,#482a13,#160d08);border:2px solid #c99a4e;border-radius:18px;padding:23px;text-align:center}
-h1{font-size:34px;letter-spacing:3px;color:#ffda8d;margin:5px}
-p{color:#dfc59c;font:13px Arial;line-height:1.6}
-select,button{width:100%;padding:13px;margin-top:10px;border-radius:9px;border:1px solid #c99a4e;background:#28180d;color:#ffe2a2;font-size:16px}
-button{background:linear-gradient(#b77a2e,#754019);font-weight:bold;cursor:pointer}
-#controls{position:fixed;bottom:18px;left:15px;right:15px;display:flex;justify-content:space-between;pointer-events:none}
-.pad{display:flex;gap:12px;pointer-events:auto}
-.control{width:68px;height:68px;border-radius:50%;background:#28180ddd;color:#ffe2a2;border:2px solid #d3a85e;font-size:27px;touch-action:none}
-#pause{position:fixed;right:12px;top:80px;width:45px;padding:8px;pointer-events:auto}
-#message{position:fixed;top:22%;width:100%;text-align:center;font: bold 15px Arial;color:#ffe6ae;text-shadow:0 2px 5px black;pointer-events:none}
+body{margin:0;overflow:hidden;background:#17100b;color:#ffe1a0;font-family:Georgia,serif}
+canvas{display:block}
+#hud{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}
+.panel{background:#21170edc;border:1px solid #c99a4c;border-radius:10px;padding:9px 13px;text-align:center;font:12px Arial;min-width:75px}
+.panel b{display:block;color:#ffdc91;font-size:19px;margin-top:5px}
+#menu{position:fixed;inset:0;background:linear-gradient(#120b08d9,#120b08f5);display:flex;align-items:center;justify-content:center;padding:16px}
+.card{width:min(420px,100%);background:linear-gradient(145deg,#54351b,#1b1009);border:2px solid #c79b53;border-radius:20px;padding:25px;text-align:center;box-shadow:0 15px 50px #000}
+h1{font-size:36px;letter-spacing:3px;color:#ffdc92;margin:5px}
+.sub{color:#d8b77c;font-size:13px;line-height:1.7}
+select,button{width:100%;padding:13px;margin-top:11px;border:1px solid #bd914c;border-radius:9px;background:#291a0f;color:#ffe1a0;font-size:15px}
+button{background:linear-gradient(#c28a3d,#75431e);font-weight:bold}
+#controls{position:fixed;bottom:18px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:end;pointer-events:none}
+.group{display:flex;gap:12px;pointer-events:auto}
+.control{width:66px;height:66px;border-radius:50%;font-size:25px;background:#29190ddc;border:2px solid #d7ad65;color:#ffe6ae;touch-action:none;pointer-events:auto}
+#pause{position:fixed;top:90px;right:12px;width:46px;padding:9px}
+#hint{position:fixed;top:95px;width:100%;text-align:center;color:#ffe5b4;font:12px Arial;text-shadow:0 2px 5px #000;pointer-events:none}
+#toast{position:fixed;top:22%;width:100%;text-align:center;font-size:20px;color:#ffdf8b;text-shadow:0 2px 6px #000;pointer-events:none}
 </style>
 </head>
 <body>
-<canvas id="game"></canvas>
 <div id="hud">
- <div class="stat">DISTANCE<b id="dist">0 m</b></div>
- <div class="stat">SCORE<b id="score">0</b></div>
- <div class="stat">SPEED<b id="speed">0</b></div>
+ <div class="panel">DISTANCE<b id="distance">0 m</b></div>
+ <div class="panel">GOLD<b id="score">0</b></div>
+ <div class="panel">SPEED<b id="speed">0</b></div>
 </div>
-<button id="pause" onclick="togglePause()">Ⅱ</button>
-<div id="message">DODGE OBSTACLES • COLLECT GOLD</div>
+<div id="hint">ARROWS / A-D TO STEER • COLLECT GOLD</div>
+<div id="toast"></div>
+<button id="pause" onclick="pauseGame()">Ⅱ</button>
 <div id="controls">
- <div class="pad">
+ <div class="group">
   <button class="control" id="left">◀</button>
   <button class="control" id="right">▶</button>
  </div>
- <button class="control" id="brake">Ⅱ</button>
+ <div class="group">
+  <button class="control" id="brake">▼</button>
+  <button class="control" id="gas">▲</button>
+ </div>
 </div>
 <div id="menu">
  <div class="card">
   <h1>RATHA RACE</h1>
-  <p>🏛️ A RACE THROUGH ANCIENT BHARAT 🏛️</p>
-  <p>Choose your kingdom and vehicle.</p>
+  <div class="sub">⚜ THE LEGEND OF ANCIENT BHARAT ⚜<br><br>Enter the royal racing arena.</div>
   <select id="era">
-   <option value="0">Mauryan Empire - Royal Palace</option>
-   <option value="1">Gupta Age - Sacred Temples</option>
-   <option value="2">Rajput Kingdom - Desert Forts</option>
-   <option value="3">Chola Dynasty - Temple Coast</option>
+   <option value="0">Mauryan Empire</option>
+   <option value="1">Gupta Kingdom</option>
+   <option value="2">Rajput Kingdom</option>
+   <option value="3">Chola Dynasty</option>
   </select>
   <select id="vehicle">
    <option value="0">Royal Horse Chariot</option>
-   <option value="1">Bullock Cart</option>
-   <option value="2">Royal Elephant</option>
-   <option value="3">Warrior Horse</option>
+   <option value="1">Warrior Horse</option>
+   <option value="2">Royal Bullock Cart</option>
   </select>
-  <button onclick="startGame()">START RACING</button>
-  <p>PC: Arrow keys or A/D to steer.<br>Phone: Use the left and right buttons.<br>Collect gold. Avoid road obstacles!</p>
+  <button onclick="startGame()">ENTER THE RACE</button>
+  <p class="sub">Third-person racing • 3D environment<br>Android touch + PC keyboard</p>
  </div>
 </div>
-<script>
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
-let W,H,playing=false,paused=false,era=0,vehicle=0;
-let lane=0,objects=[],distance=0,score=0,speed=220,spawn=0,last=0;
-function resize(){
- W=canvas.width=innerWidth*devicePixelRatio;
- H=canvas.height=innerHeight*devicePixelRatio;
- ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
- W=innerWidth;H=innerHeight;
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0xb5a078);
+scene.fog=new THREE.Fog(0xb5a078,35,155);
+
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,250);
+camera.position.set(0,5,11);
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.25;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffe4bb,0x54402c,2));
+const sun=new THREE.DirectionalLight(0xffdfad,3);
+sun.position.set(-25,35,20);
+sun.castShadow=true;
+sun.shadow.mapSize.set(1024,1024);
+scene.add(sun);
+
+const mat=(color,rough=.8,metal=0)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal});
+const dirt=mat(0x987044),stone=mat(0xc09a68),gold=mat(0xd8a43f,.35,.65);
+const dark=mat(0x352116),wood=mat(0x70401e),cloth=mat(0x8b2920);
+const grass=mat(0x52613a),horseMat=mat(0x75462d),black=mat(0x211812);
+
+let era=0,vehicle=0,playing=false,paused=false;
+let lane=0,distance=0,score=0,velocity=0,worldSpeed=19;
+let objects=[],decor=[],wheels=[],legs=[],horses=[];
+const roadWidth=13;
+
+function box(parent,x,y,z,sx,sy,sz,material){
+ const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);
+ m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
 }
-addEventListener("resize",resize);resize();
-function roadPoint(y){
- let t=(y/H);
- let half= W*(.045+t*.43);
- return {l:W/2-half,r:W/2+half};
+function sphere(parent,x,y,z,sx,sy,sz,material){
+ const m=new THREE.Mesh(new THREE.SphereGeometry(1,12,10),material);
+ m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;parent.add(m);return m;
 }
-function polygon(points,color){
- ctx.fillStyle=color;ctx.beginPath();
- points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));
- ctx.closePath();ctx.fill();
+function cylinder(parent,x,y,z,r1,r2,h,material,segments=12){
+ const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,segments),material);
+ m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;
 }
-function drawTemple(x,y,s){
- ctx.save();ctx.translate(x,y);ctx.scale(s,s);
- ctx.fillStyle=era===2?"#9a5931":"#c49a62";
- ctx.fillRect(-34,-55,68,55);
- ctx.fillRect(-42,-61,84,9);
+function makeHorse(parent,x,z){
+ const g=new THREE.Group();g.position.set(x,0,z);parent.add(g);
+ sphere(g,0,1.12,0,.43,.37,.86,horseMat);
+ sphere(g,0,1.52,-.55,.27,.4,.28,horseMat);
+ sphere(g,0,1.78,-.68,.22,.24,.25,horseMat);
+ sphere(g,-.13,1.84,-.87,.045,.045,.045,black);
+ sphere(g,.13,1.84,-.87,.045,.045,.045,black);
+ cylinder(g,-.13,1.99,-.62,.035,.09,.27,dark);
+ cylinder(g,.13,1.99,-.62,.035,.09,.27,dark);
+ // flowing mane and tail
  for(let i=0;i<5;i++){
-  polygon([[-28+i*3,-61-i*12],[28-i*3,-61-i*12],[0,-76-i*12]],"#a87942");
+  let m=sphere(g,(i-2)*.07,1.68,-.43,.055,.19,.06,black);
+  m.rotation.z=-.35;
  }
- ctx.fillStyle="#372017";ctx.fillRect(-8,-35,16,35);
- ctx.restore();
-}
-function drawWorld(){
- let sky=ctx.createLinearGradient(0,0,0,H);
- sky.addColorStop(0,era===2?"#b66a3d":"#6b8d9b");
- sky.addColorStop(.65,era===2?"#e3a05b":"#e9b879");
- sky.addColorStop(1,"#c28a4f");
- ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
- ctx.fillStyle="#ffd88a";ctx.beginPath();ctx.arc(W*.78,H*.18,H*.055,0,7);ctx.fill();
- polygon([[0,H*.46],[W*.2,H*.34],[W*.4,H*.46],[W*.65,H*.32],[W,H*.45],[W,H],[0,H]],era===2?"#a36c3d":"#596c42");
- // moving scenery
+ let tail=sphere(g,0,1.25,.83,.09,.3,.13,black);
+ tail.rotation.x=-.6;
  for(let side of [-1,1]){
-  for(let i=0;i<5;i++){
-   let y=((i*H*.28+(distance*.55)% (H*.3))%(H*.85))+H*.12;
-   let s=.25+y/H*.75;
-   let x=W/2+side*(W*.18+y*.38);
-   if(era===1||era===3)drawTemple(x,y,s);
-   else{
-    ctx.fillStyle="#9a673d";ctx.fillRect(x-25*s,y-55*s,50*s,55*s);
-    ctx.fillStyle="#d5a05a";ctx.fillRect(x-31*s,y-62*s,62*s,8*s);
-    ctx.fillStyle="#382014";ctx.fillRect(x-7*s,y-29*s,14*s,29*s);
-   }
+  for(let front of [-1,1]){
+   let pivot=new THREE.Group();
+   pivot.position.set(side*.25,1.0,front*-.48);
+   g.add(pivot);
+   box(pivot,0,-.34,0,.14,.72,.16,horseMat);
+   box(pivot,0,-.69,-.02,.17,.12,.25,black);
+   legs.push({pivot,phase:Math.random()*6,front});
   }
  }
- // ground and road
- ctx.fillStyle=era===2?"#b77a42":"#6e6c3d";ctx.fillRect(0,H*.48,W,H*.52);
- let top=H*.42,bottom=H*1.05;
- polygon([[W/2-W*.055,top],[W/2+W*.055,top],[W*1.04,bottom],[-W*.04,bottom]],"#49382b");
- for(let i=0;i<14;i++){
-  let y=top+(i/14)*(bottom-top);
-  let p=roadPoint(y);
-  ctx.fillStyle=i%2?"#6d5038":"#49382b";
-  ctx.fillRect(p.l,y,p.r-p.l,Math.max(2,H*.012));
- }
- for(let side of [-1,1]){
-  for(let j=0;j<2;j++){
-   ctx.strokeStyle="#e0bd7a";ctx.lineWidth=2;
-   ctx.beginPath();ctx.moveTo(W/2+side*W*.055,H*.42);
-   ctx.lineTo(W/2+side*W*.49,H*1.05);ctx.stroke();
-  }
- }
- // lane markers
- for(let i=0;i<9;i++){
-  let y=H*.46+((i*H*.11+distance*1.5)%(H*.58));
-  let p=roadPoint(y),x=W/2;
-  ctx.fillStyle="#e6c58b";ctx.fillRect(x-2,y,4,Math.max(3,y/H*12));
- }
+ // golden harness
+ sphere(g,0,1.43,-.58,.29,.06,.1,gold);
+ horses.push(g);
+ return g;
 }
-function drawVehicle(){
- let x=W/2+lane*W*.22,y=H*.82,s=Math.min(W/390,1.35);
- ctx.save();ctx.translate(x,y);ctx.scale(s,s);
- // wheels
- ctx.fillStyle="#20130d";
- for(let a of [-45,45]){
-  ctx.beginPath();ctx.ellipse(a,5,10,24,-.2,0,7);ctx.fill();
-  ctx.strokeStyle="#c38c43";ctx.lineWidth=3;ctx.stroke();
- }
- if(vehicle===2){
-  ctx.fillStyle="#77766b";ctx.beginPath();ctx.ellipse(0,-28,42,44,0,0,7);ctx.fill();
-  ctx.beginPath();ctx.arc(0,-65,25,0,7);ctx.fill();
-  ctx.fillStyle="#d7a747";ctx.fillRect(-32,-95,64,12);
-  ctx.fillRect(-26,-118,52,23);
+function makeChariot(){
+ const g=new THREE.Group();
+ scene.add(g);
+ if(vehicle===1){
+  makeHorse(g,0,.5);
  }else{
-  ctx.fillStyle=vehicle===1?"#d4c5a0":"#8b4d29";
-  if(vehicle===3){ctx.beginPath();ctx.ellipse(0,-30,22,40,0,0,7);ctx.fill();ctx.fillRect(-13,-80,26,42);}
-  else{
-   ctx.fillRect(-43,-51,86,42);
-   ctx.fillStyle="#d49a43";ctx.fillRect(-46,-55,92,8);
-   ctx.fillStyle="#402516";ctx.fillRect(-35,-9,70,7);
-   ctx.fillStyle="#9b6231";
-   for(let a of [-20,20]){
-    ctx.beginPath();ctx.ellipse(a,-82,13,25,-.2,0,7);ctx.fill();
-    ctx.beginPath();ctx.arc(a,-105,12,0,7);ctx.fill();
-   }
+  makeHorse(g,-.62,.5);makeHorse(g,.62,.5);
+ }
+ // chassis and platform
+ box(g,0,.78,1.55,2.05,.22,1.55,wood);
+ box(g,0,.95,1.65,1.8,.12,1.3,gold);
+ box(g,0,1.35,2.05,1.9,.85,.16,wood);
+ box(g,0,1.79,2.05,2,.12,.2,gold);
+ for(let x of [-.85,.85]){
+  let wheel=new THREE.Group();
+  wheel.position.set(x,.65,1.65);
+  wheel.rotation.z=Math.PI/2;
+  g.add(wheel);
+  let rim=new THREE.Mesh(new THREE.TorusGeometry(.63,.075,8,24),gold);
+  wheel.add(rim);
+  cylinder(wheel,0,0,0,.12,.12,.25,wood);
+  for(let i=0;i<10;i++){
+   let a=i*Math.PI/5;
+   let spoke=box(wheel,Math.sin(a)*.3,Math.cos(a)*.3,0,.055,.62,.045,gold);
+   spoke.rotation.z=-a;
+  }
+  wheels.push(wheel);
+ }
+ // driver silhouette
+ sphere(g,0,1.8,1.75,.29,.38,.23,mat(0x9a603b));
+ sphere(g,0,2.23,1.75,.23,.25,.23,mat(0x9a603b));
+ cylinder(g,0,2.48,1.75,.27,.24,.13,gold);
+ let turban=sphere(g,0,2.48,1.75,.31,.14,.27,cloth);
+ box(g,0,2.35,1.49,.07,.38,.07,wood);
+ return g;
+}
+let chariot;
+
+function makeTemple(x,z){
+ const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+ let base=box(g,0,.4,0,5,.8,4,stone);
+ box(g,0,1,0,4.5,.3,3.7,gold);
+ for(let i=0;i<4;i++){
+  let h=1.5+i*.65;
+  let roof= new THREE.Mesh(new THREE.ConeGeometry(2.3-i*.32,h,4),stone);
+  roof.position.set(0,1.4+h/2,0);roof.rotation.y=Math.PI/4;g.add(roof);
+ }
+ box(g,0,1.4,2.01,.9,1.7,.12,dark);
+ return g;
+}
+function makeTree(x,z){
+ const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+ cylinder(g,0,1,0,.22,.3,2,wood);
+ let crown=new THREE.Mesh(new THREE.ConeGeometry(1.5,3.5,7),grass);
+ crown.position.y=3;g.add(crown);
+}
+function makeEnvironment(){
+ // ground
+ const ground=new THREE.Mesh(new THREE.PlaneGeometry(220,260),dirt);
+ ground.rotation.x=-Math.PI/2;ground.position.set(0,-.08,-90);
+ ground.receiveShadow=true;scene.add(ground);
+ // road
+ const road=box(scene,0,-.015,-90,roadWidth,.08,250,dark);
+ // road shoulders
+ for(let x of [-7,7])box(scene,x,.02,-90,.45,.12,250,gold);
+ // lane markers
+ for(let z=-210;z<25;z+=12){
+  for(let x of [-2.15,2.15]){
+   box(scene,x,.045,z,.12,.035,4,mat(0xe1c18b));
   }
  }
- ctx.fillStyle="#f0c76b";ctx.fillRect(-5,-65,10,10);
- ctx.restore();
-}
-function drawObjects(){
- for(let o of objects){
-  let t=1-o.z;
-  let y=H*(.45+t*.48);
-  let x=W/2+o.lane*(W*(.055+t*.38));
-  let s=.25+t*1.2;
-  if(o.type==="coin"){
-   ctx.fillStyle="#ffdc55";ctx.beginPath();ctx.arc(x,y,11*s,0,7);ctx.fill();
-   ctx.strokeStyle="#fff0a0";ctx.lineWidth=3*s;ctx.stroke();
-  }else{
-   ctx.fillStyle="#74401e";ctx.fillRect(x-17*s,y-25*s,34*s,25*s);
-   ctx.fillStyle="#d6a34c";ctx.fillRect(x-20*s,y-29*s,40*s,6*s);
-  }
+ for(let z=-205;z<20;z+=25){
+  makeTree(-11,z);makeTree(11,z);
+  if(era===0||era===1)makeTemple(-18,z-7);
+  else makeTemple(18,z-7);
+ }
+ // distant hills
+ for(let i=0;i<14;i++){
+  let m=new THREE.Mesh(new THREE.ConeGeometry(12+Math.random()*10,12+Math.random()*12,5),grass);
+  m.position.set((Math.random()-.5)*100,5,-100-Math.random()*90);scene.add(m);
  }
 }
-function addObjects(){
+function spawnObject(){
+ let type=Math.random()<.55?'coin':'obstacle';
  let laneChoice=Math.floor(Math.random()*3)-1;
- objects.push({lane:laneChoice,z:0,type:Math.random()<.43?"coin":"block"});
+ let mesh;
+ if(type==='coin'){
+  mesh=new THREE.Mesh(new THREE.TorusGeometry(.42,.12,8,18),gold);
+  mesh.position.y=1.1;
+ }else{
+  mesh=new THREE.Group();
+  box(mesh,0,.55,0,1.3,1.1,1.2,wood);
+  box(mesh,0,1.15,0,1.5,.12,1.4,gold);
+ }
+ mesh.position.set(laneChoice*3,0,-115);
+ scene.add(mesh);
+ objects.push({mesh,type,lane:laneChoice});
 }
 function startGame(){
- era=+document.getElementById("era").value;
- vehicle=+document.getElementById("vehicle").value;
- lane=0;objects=[];distance=0;score=0;speed=220;spawn=0;
- playing=true;paused=false;last=0;
- document.getElementById("menu").style.display="none";
- document.getElementById("message").textContent="RACE ON! COLLECT GOLD!";
+ era=+document.getElementById('era').value;
+ vehicle=+document.getElementById('vehicle').value;
+ // reset scene
+ for(let o of [...objects,...decor])scene.remove(o.mesh||o);
+ objects=[];decor=[];
+ if(chariot)scene.remove(chariot);
+ wheels=[];legs=[];horses=[];
+ makeEnvironment();
+ chariot=makeChariot();
+ lane=0;distance=0;score=0;velocity=19;
+ playing=true;paused=false;
+ document.getElementById('menu').style.display='none';
+ document.getElementById('toast').textContent='THE RACE BEGINS!';
+ setTimeout(()=>document.getElementById('toast').textContent='',1500);
 }
-function finish(){
- playing=false;
- document.getElementById("menu").style.display="flex";
- document.querySelector("#menu h1").textContent="RACE FINISHED!";
- document.querySelector("#menu .card p").textContent="Distance: "+Math.floor(distance)+" m | Score: "+score;
-}
-function steer(n){if(playing&&!paused)lane=Math.max(-1,Math.min(1,lane+n))}
-function togglePause(){if(playing){paused=!paused;document.getElementById("message").textContent=paused?"PAUSED":"RACE ON!"}}
-addEventListener("keydown",e=>{
- if(e.key==="ArrowLeft"||e.key.toLowerCase()==="a")steer(-1);
- if(e.key==="ArrowRight"||e.key.toLowerCase()==="d")steer(1);
- if(e.code==="Space")togglePause();
+function steer(d){if(playing&&!paused)lane=Math.max(-1,Math.min(1,lane+d))}
+function pauseGame(){if(playing)paused=!paused}
+addEventListener('keydown',e=>{
+ if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')steer(-1);
+ if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')steer(1);
+ if(e.key==='ArrowUp')velocity=Math.min(34,velocity+1);
+ if(e.key==='ArrowDown')velocity=Math.max(8,velocity-2);
+ if(e.code==='Space')pauseGame();
 });
 function bind(id,fn){
- let el=document.getElementById(id);
- el.addEventListener("pointerdown",e=>{e.preventDefault();fn()});
+ const el=document.getElementById(id);
+ el.addEventListener('pointerdown',e=>{e.preventDefault();fn()});
 }
-bind("left",()=>steer(-1));bind("right",()=>steer(1));bind("brake",togglePause);
-function frame(time){
- let dt=Math.min((time-last)/1000||0,.04);last=time;
- drawWorld();
- if(playing&&!paused){
-  distance+=speed*dt/8;spawn+=dt;
-  if(spawn>.85){spawn=0;addObjects()}
-  for(let o of objects){
-   o.z+=dt*.34;
-   if(o.z>.88&&o.z<1.02&&o.lane===lane){
-    if(o.type==="coin"){score+=50;o.z=2}
-    else{o.z=2;score=Math.max(0,score-20);document.getElementById("message").textContent="OBSTACLE HIT!"}
-   }
+bind('left',()=>steer(-1));bind('right',()=>steer(1));
+bind('gas',()=>velocity=Math.min(34,velocity+2));
+bind('brake',()=>velocity=Math.max(8,velocity-3));
+let clock=new THREE.Clock(),spawnTimer=0;
+function update(dt){
+ if(!playing||paused)return;
+ distance+=velocity*dt*.75;
+ spawnTimer+=dt;
+ if(spawnTimer>1.35){spawnTimer=0;spawnObject()}
+ // smooth chariot movement
+ chariot.position.x+=(lane*3-chariot.position.x)*Math.min(1,dt*5);
+ chariot.position.z=3;
+ chariot.rotation.z+=( -lane*.07-chariot.rotation.z)*dt*4;
+ // animate wheels
+ wheels.forEach(w=>w.rotation.x+=dt*velocity*1.7);
+ // animate horse legs
+ legs.forEach(l=>{
+  l.pivot.rotation.x=Math.sin(clock.elapsedTime*velocity*.65+l.phase)*.48;
+ });
+ horses.forEach(h=>h.position.y=Math.abs(Math.sin(clock.elapsedTime*velocity*.65))*.045);
+ // obstacles and coins
+ for(let i=objects.length-1;i>=0;i--){
+  let o=objects[i];o.mesh.position.z+=velocity*dt;
+  if(Math.abs(o.mesh.position.z-3)<2.3&&Math.abs(o.mesh.position.x-chariot.position.x)<1.5){
+   if(o.type==='coin'){score+=10;document.getElementById('toast').textContent='+10 GOLD'}
+   else{velocity=Math.max(8,velocity*.58);document.getElementById('toast').textContent='COLLISION!'}
+   scene.remove(o.mesh);objects.splice(i,1);continue;
   }
-  objects=objects.filter(o=>o.z<1.15);
-  if(distance>1500)finish();
-  document.getElementById("dist").textContent=Math.floor(distance)+" m";
-  document.getElementById("score").textContent=score;
-  document.getElementById("speed").textContent=Math.floor(speed)+" km/h";
+  if(o.mesh.position.z>12){scene.remove(o.mesh);objects.splice(i,1)}
  }
- drawObjects();drawVehicle();
- requestAnimationFrame(frame);
+ document.getElementById('distance').textContent=Math.floor(distance)+' m';
+ document.getElementById('score').textContent=score;
+ document.getElementById('speed').textContent=Math.floor(velocity*5)+' km/h';
+ if(distance>2000){
+  playing=false;
+  document.getElementById('menu').style.display='flex';
+  document.querySelector('#menu h1').textContent='VICTORY!';
+  document.querySelector('#menu .sub').innerHTML='Race complete!<br>Distance: '+Math.floor(distance)+' m<br>Gold collected: '+score;
+ }
 }
-requestAnimationFrame(frame);
+function render(){
+ requestAnimationFrame(render);
+ let dt=Math.min(clock.getDelta(),.05);
+ update(dt);
+ if(chariot){
+  const target=new THREE.Vector3(chariot.position.x*.45,5.0,10.5);
+  camera.position.lerp(target,1-Math.exp(-dt*3));
+  camera.lookAt(chariot.position.x*.3,1.1,-9);
+ }
+ renderer.render(scene,camera);
+}
+render();
+addEventListener('resize',()=>{
+ camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
+});
 </script>
 </body>
-  </html>
-  
+</html>
