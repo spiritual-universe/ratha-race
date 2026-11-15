@@ -4,37 +4,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>RATHA RACE | Ancient Bharat 3D</title>
+<title>RATHA RACE - Ancient Bharat 3D</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;overflow:hidden;background:#17100b;color:#ffe1a0;font-family:Georgia,serif}
+body{
+ margin:0;overflow:hidden;background:#17100b;
+ color:#ffe1a0;font-family:Georgia,serif;
+ touch-action:none
+}
 canvas{display:block}
-#hud{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}
-.panel{background:#21170edc;border:1px solid #c99a4c;border-radius:10px;padding:9px 13px;text-align:center;font:12px Arial;min-width:75px}
+#hud{
+ position:fixed;top:12px;left:12px;right:12px;
+ display:flex;justify-content:space-between;
+ pointer-events:none
+}
+.panel{
+ background:#21170edc;border:1px solid #c99a4c;
+ border-radius:10px;padding:9px 13px;
+ text-align:center;font:12px Arial;min-width:75px
+}
 .panel b{display:block;color:#ffdc91;font-size:19px;margin-top:5px}
-#menu{position:fixed;inset:0;background:linear-gradient(#120b08d9,#120b08f5);display:flex;align-items:center;justify-content:center;padding:16px}
-.card{width:min(420px,100%);background:linear-gradient(145deg,#54351b,#1b1009);border:2px solid #c79b53;border-radius:20px;padding:25px;text-align:center;box-shadow:0 15px 50px #000}
+#menu{
+ position:fixed;inset:0;
+ background:linear-gradient(#120b08d9,#120b08f5);
+ display:flex;align-items:center;justify-content:center;
+ padding:16px;z-index:5
+}
+.card{
+ width:min(420px,100%);
+ background:linear-gradient(145deg,#54351b,#1b1009);
+ border:2px solid #c79b53;border-radius:20px;
+ padding:25px;text-align:center;
+ box-shadow:0 15px 50px #000
+}
 h1{font-size:36px;letter-spacing:3px;color:#ffdc92;margin:5px}
 .sub{color:#d8b77c;font-size:13px;line-height:1.7}
-select,button{width:100%;padding:13px;margin-top:11px;border:1px solid #bd914c;border-radius:9px;background:#291a0f;color:#ffe1a0;font-size:15px}
-button{background:linear-gradient(#c28a3d,#75431e);font-weight:bold}
-#controls{position:fixed;bottom:18px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:end;pointer-events:none}
+select,button{
+ width:100%;padding:13px;margin-top:11px;
+ border:1px solid #bd914c;border-radius:9px;
+ background:#291a0f;color:#ffe1a0;font-size:15px
+}
+button{
+ background:linear-gradient(#c28a3d,#75431e);
+ font-weight:bold;cursor:pointer
+}
+button:active{transform:scale(.96)}
+#controls{
+ position:fixed;bottom:18px;left:14px;right:14px;
+ display:flex;justify-content:space-between;
+ align-items:end;pointer-events:none;z-index:3
+}
 .group{display:flex;gap:12px;pointer-events:auto}
-.control{width:66px;height:66px;border-radius:50%;font-size:25px;background:#29190ddc;border:2px solid #d7ad65;color:#ffe6ae;touch-action:none;pointer-events:auto}
-#pause{position:fixed;top:90px;right:12px;width:46px;padding:9px}
-#hint{position:fixed;top:95px;width:100%;text-align:center;color:#ffe5b4;font:12px Arial;text-shadow:0 2px 5px #000;pointer-events:none}
-#toast{position:fixed;top:22%;width:100%;text-align:center;font-size:20px;color:#ffdf8b;text-shadow:0 2px 6px #000;pointer-events:none}
+.control{
+ width:66px;height:66px;border-radius:50%;
+ font-size:25px;background:#29190ddc;
+ border:2px solid #d7ad65;color:#ffe6ae;
+ touch-action:none;padding:0;margin:0
+}
+#pause{
+ position:fixed;top:90px;right:12px;
+ width:46px;padding:9px;z-index:4
+}
+#hint{
+ position:fixed;top:95px;width:100%;
+ text-align:center;color:#ffe5b4;
+ font:12px Arial;text-shadow:0 2px 5px #000;
+ pointer-events:none
+}
+#toast{
+ position:fixed;top:22%;width:100%;
+ text-align:center;font-size:20px;color:#ffdf8b;
+ text-shadow:0 2px 6px #000;pointer-events:none
+}
 </style>
 </head>
+
 <body>
+
 <div id="hud">
  <div class="panel">DISTANCE<b id="distance">0 m</b></div>
  <div class="panel">GOLD<b id="score">0</b></div>
- <div class="panel">SPEED<b id="speed">0</b></div>
+ <div class="panel">SPEED<b id="speed">0 km/h</b></div>
 </div>
+
 <div id="hint">ARROWS / A-D TO STEER • COLLECT GOLD</div>
 <div id="toast"></div>
-<button id="pause" onclick="pauseGame()">Ⅱ</button>
+
+<button id="pause">Ⅱ</button>
+
 <div id="controls">
  <div class="group">
   <button class="control" id="left">◀</button>
@@ -45,34 +103,51 @@ button{background:linear-gradient(#c28a3d,#75431e);font-weight:bold}
   <button class="control" id="gas">▲</button>
  </div>
 </div>
+
 <div id="menu">
  <div class="card">
-  <h1>RATHA RACE</h1>
-  <div class="sub">⚜ THE LEGEND OF ANCIENT BHARAT ⚜<br><br>Enter the royal racing arena.</div>
+  <h1 id="menuTitle">RATHA RACE</h1>
+  <div class="sub" id="menuSubtitle">
+   ⚜ THE LEGEND OF ANCIENT BHARAT ⚜
+   <br><br>Enter the royal racing arena.
+  </div>
+
   <select id="era">
    <option value="0">Mauryan Empire</option>
    <option value="1">Gupta Kingdom</option>
    <option value="2">Rajput Kingdom</option>
    <option value="3">Chola Dynasty</option>
   </select>
+
   <select id="vehicle">
    <option value="0">Royal Horse Chariot</option>
    <option value="1">Warrior Horse</option>
    <option value="2">Royal Bullock Cart</option>
   </select>
-  <button onclick="startGame()">ENTER THE RACE</button>
-  <p class="sub">Third-person racing • 3D environment<br>Android touch + PC keyboard</p>
+
+  <button id="startButton">ENTER THE RACE</button>
+
+  <p class="sub">
+   Third-person racing • 3D environment
+   <br>Android touch + PC keyboard
+  </p>
  </div>
 </div>
 
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+import * as THREE from
+'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+// SCENE
 
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0xb5a078);
 scene.fog=new THREE.Fog(0xb5a078,35,155);
 
-const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,250);
+const camera=new THREE.PerspectiveCamera(
+ 65,innerWidth/innerHeight,.1,250
+);
 camera.position.set(0,5,11);
 
 const renderer=new THREE.WebGLRenderer({antialias:true});
@@ -85,249 +160,536 @@ renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.25;
 document.body.appendChild(renderer.domElement);
 
+// LIGHTING
+
 scene.add(new THREE.HemisphereLight(0xffe4bb,0x54402c,2));
+
 const sun=new THREE.DirectionalLight(0xffdfad,3);
 sun.position.set(-25,35,20);
 sun.castShadow=true;
 sun.shadow.mapSize.set(1024,1024);
 scene.add(sun);
 
-const mat=(color,rough=.8,metal=0)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal});
-const dirt=mat(0x987044),stone=mat(0xc09a68),gold=mat(0xd8a43f,.35,.65);
-const dark=mat(0x352116),wood=mat(0x70401e),cloth=mat(0x8b2920);
-const grass=mat(0x52613a),horseMat=mat(0x75462d),black=mat(0x211812);
+// MATERIALS
 
-let era=0,vehicle=0,playing=false,paused=false;
-let lane=0,distance=0,score=0,velocity=0,worldSpeed=19;
-let objects=[],decor=[],wheels=[],legs=[],horses=[];
-const roadWidth=13;
+const mat=(color,rough=.8,metal=0)=>
+ new THREE.MeshStandardMaterial({
+  color,roughness:rough,metalness:metal
+ });
+
+const dirt=mat(0x987044);
+const stone=mat(0xc09a68);
+const gold=mat(0xd8a43f,.35,.65);
+const dark=mat(0x352116);
+const wood=mat(0x70401e);
+const cloth=mat(0x8b2920);
+const grass=mat(0x52613a);
+const horseMat=mat(0x75462d);
+const black=mat(0x211812);
+
+let era=0,vehicle=0;
+let playing=false,paused=false;
+let lane=0,distance=0,score=0,velocity=19;
+let objects=[],wheels=[],legs=[],horses=[];
+let chariot=null;
 
 function box(parent,x,y,z,sx,sy,sz,material){
- const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);
- m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
+ const m=new THREE.Mesh(
+  new THREE.BoxGeometry(sx,sy,sz),material
+ );
+ m.position.set(x,y,z);
+ m.castShadow=true;
+ m.receiveShadow=true;
+ parent.add(m);
+ return m;
 }
+
 function sphere(parent,x,y,z,sx,sy,sz,material){
- const m=new THREE.Mesh(new THREE.SphereGeometry(1,12,10),material);
- m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;parent.add(m);return m;
+ const m=new THREE.Mesh(
+  new THREE.SphereGeometry(1,12,10),material
+ );
+ m.position.set(x,y,z);
+ m.scale.set(sx,sy,sz);
+ m.castShadow=true;
+ parent.add(m);
+ return m;
 }
-function cylinder(parent,x,y,z,r1,r2,h,material,segments=12){
- const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,segments),material);
- m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;
+
+function cylinder(parent,x,y,z,r1,r2,h,material){
+ const m=new THREE.Mesh(
+  new THREE.CylinderGeometry(r1,r2,h,12),material
+ );
+ m.position.set(x,y,z);
+ m.castShadow=true;
+ parent.add(m);
+ return m;
 }
+
+// HORSE MODEL
+
 function makeHorse(parent,x,z){
- const g=new THREE.Group();g.position.set(x,0,z);parent.add(g);
+ const g=new THREE.Group();
+ g.position.set(x,0,z);
+ parent.add(g);
+
  sphere(g,0,1.12,0,.43,.37,.86,horseMat);
  sphere(g,0,1.52,-.55,.27,.4,.28,horseMat);
  sphere(g,0,1.78,-.68,.22,.24,.25,horseMat);
+
  sphere(g,-.13,1.84,-.87,.045,.045,.045,black);
  sphere(g,.13,1.84,-.87,.045,.045,.045,black);
+
  cylinder(g,-.13,1.99,-.62,.035,.09,.27,dark);
  cylinder(g,.13,1.99,-.62,.035,.09,.27,dark);
- // flowing mane and tail
+
  for(let i=0;i<5;i++){
-  let m=sphere(g,(i-2)*.07,1.68,-.43,.055,.19,.06,black);
+  let m=sphere(
+   g,(i-2)*.07,1.68,-.43,
+   .055,.19,.06,black
+  );
   m.rotation.z=-.35;
  }
+
  let tail=sphere(g,0,1.25,.83,.09,.3,.13,black);
  tail.rotation.x=-.6;
+
  for(let side of [-1,1]){
   for(let front of [-1,1]){
    let pivot=new THREE.Group();
    pivot.position.set(side*.25,1.0,front*-.48);
    g.add(pivot);
+
    box(pivot,0,-.34,0,.14,.72,.16,horseMat);
    box(pivot,0,-.69,-.02,.17,.12,.25,black);
-   legs.push({pivot,phase:Math.random()*6,front});
+
+   legs.push({
+    pivot,
+    phase:Math.random()*6
+   });
   }
  }
- // golden harness
+
  sphere(g,0,1.43,-.58,.29,.06,.1,gold);
  horses.push(g);
  return g;
 }
+
+// CHARIOT
+
 function makeChariot(){
  const g=new THREE.Group();
  scene.add(g);
+
  if(vehicle===1){
   makeHorse(g,0,.5);
  }else{
-  makeHorse(g,-.62,.5);makeHorse(g,.62,.5);
+  makeHorse(g,-.62,.5);
+  makeHorse(g,.62,.5);
  }
- // chassis and platform
+
  box(g,0,.78,1.55,2.05,.22,1.55,wood);
  box(g,0,.95,1.65,1.8,.12,1.3,gold);
  box(g,0,1.35,2.05,1.9,.85,.16,wood);
  box(g,0,1.79,2.05,2,.12,.2,gold);
+
  for(let x of [-.85,.85]){
   let wheel=new THREE.Group();
   wheel.position.set(x,.65,1.65);
   wheel.rotation.z=Math.PI/2;
   g.add(wheel);
-  let rim=new THREE.Mesh(new THREE.TorusGeometry(.63,.075,8,24),gold);
+
+  let rim=new THREE.Mesh(
+   new THREE.TorusGeometry(.63,.075,8,24),gold
+  );
   wheel.add(rim);
+
   cylinder(wheel,0,0,0,.12,.12,.25,wood);
+
   for(let i=0;i<10;i++){
    let a=i*Math.PI/5;
-   let spoke=box(wheel,Math.sin(a)*.3,Math.cos(a)*.3,0,.055,.62,.045,gold);
+   let spoke=box(
+    wheel,
+    Math.sin(a)*.3,
+    Math.cos(a)*.3,
+    0,.055,.62,.045,gold
+   );
    spoke.rotation.z=-a;
   }
+
   wheels.push(wheel);
  }
- // driver silhouette
+
  sphere(g,0,1.8,1.75,.29,.38,.23,mat(0x9a603b));
  sphere(g,0,2.23,1.75,.23,.25,.23,mat(0x9a603b));
  cylinder(g,0,2.48,1.75,.27,.24,.13,gold);
- let turban=sphere(g,0,2.48,1.75,.31,.14,.27,cloth);
- box(g,0,2.35,1.49,.07,.38,.07,wood);
+ sphere(g,0,2.48,1.75,.31,.14,.27,cloth);
+
  return g;
 }
-let chariot;
+
+// TEMPLE ENVIRONMENT
 
 function makeTemple(x,z){
- const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
- let base=box(g,0,.4,0,5,.8,4,stone);
+ const g=new THREE.Group();
+ g.position.set(x,0,z);
+ scene.add(g);
+
+ box(g,0,.4,0,5,.8,4,stone);
  box(g,0,1,0,4.5,.3,3.7,gold);
+
  for(let i=0;i<4;i++){
   let h=1.5+i*.65;
-  let roof= new THREE.Mesh(new THREE.ConeGeometry(2.3-i*.32,h,4),stone);
-  roof.position.set(0,1.4+h/2,0);roof.rotation.y=Math.PI/4;g.add(roof);
+  let roof=new THREE.Mesh(
+   new THREE.ConeGeometry(2.3-i*.32,h,4),stone
+  );
+  roof.position.set(0,1.4+h/2,0);
+  roof.rotation.y=Math.PI/4;
+  g.add(roof);
  }
+
  box(g,0,1.4,2.01,.9,1.7,.12,dark);
- return g;
 }
+
 function makeTree(x,z){
- const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+ const g=new THREE.Group();
+ g.position.set(x,0,z);
+ scene.add(g);
+
  cylinder(g,0,1,0,.22,.3,2,wood);
- let crown=new THREE.Mesh(new THREE.ConeGeometry(1.5,3.5,7),grass);
- crown.position.y=3;g.add(crown);
+
+ let crown=new THREE.Mesh(
+  new THREE.ConeGeometry(1.5,3.5,7),grass
+ );
+ crown.position.y=3;
+ g.add(crown);
 }
+
+// WORLD
+
 function makeEnvironment(){
- // ground
- const ground=new THREE.Mesh(new THREE.PlaneGeometry(220,260),dirt);
- ground.rotation.x=-Math.PI/2;ground.position.set(0,-.08,-90);
- ground.receiveShadow=true;scene.add(ground);
- // road
- const road=box(scene,0,-.015,-90,roadWidth,.08,250,dark);
- // road shoulders
- for(let x of [-7,7])box(scene,x,.02,-90,.45,.12,250,gold);
- // lane markers
+
+ const ground=new THREE.Mesh(
+  new THREE.PlaneGeometry(220,260),dirt
+ );
+ ground.rotation.x=-Math.PI/2;
+ ground.position.set(0,-.08,-90);
+ ground.receiveShadow=true;
+ scene.add(ground);
+
+ box(scene,0,-.015,-90,13,.08,250,dark);
+
+ for(let x of [-7,7]){
+  box(scene,x,.02,-90,.45,.12,250,gold);
+ }
+
+ const marker=mat(0xe1c18b);
+
  for(let z=-210;z<25;z+=12){
   for(let x of [-2.15,2.15]){
-   box(scene,x,.045,z,.12,.035,4,mat(0xe1c18b));
+   box(scene,x,.045,z,.12,.035,4,marker);
   }
  }
+
  for(let z=-205;z<20;z+=25){
-  makeTree(-11,z);makeTree(11,z);
-  if(era===0||era===1)makeTemple(-18,z-7);
-  else makeTemple(18,z-7);
+  makeTree(-11,z);
+  makeTree(11,z);
+
+  if(era===0||era===1){
+   makeTemple(-18,z-7);
+  }else{
+   makeTemple(18,z-7);
+  }
  }
- // distant hills
+
  for(let i=0;i<14;i++){
-  let m=new THREE.Mesh(new THREE.ConeGeometry(12+Math.random()*10,12+Math.random()*12,5),grass);
-  m.position.set((Math.random()-.5)*100,5,-100-Math.random()*90);scene.add(m);
+  let m=new THREE.Mesh(
+   new THREE.ConeGeometry(12+Math.random()*10,
+   12+Math.random()*12,5),grass
+  );
+  m.position.set(
+   (Math.random()-.5)*100,
+   5,-100-Math.random()*90
+  );
+  scene.add(m);
  }
 }
+
+// COINS AND OBSTACLES
+
 function spawnObject(){
  let type=Math.random()<.55?'coin':'obstacle';
  let laneChoice=Math.floor(Math.random()*3)-1;
  let mesh;
+
  if(type==='coin'){
-  mesh=new THREE.Mesh(new THREE.TorusGeometry(.42,.12,8,18),gold);
+  mesh=new THREE.Mesh(
+   new THREE.TorusGeometry(.42,.12,8,18),gold
+  );
   mesh.position.y=1.1;
  }else{
   mesh=new THREE.Group();
   box(mesh,0,.55,0,1.3,1.1,1.2,wood);
   box(mesh,0,1.15,0,1.5,.12,1.4,gold);
  }
+
  mesh.position.set(laneChoice*3,0,-115);
  scene.add(mesh);
- objects.push({mesh,type,lane:laneChoice});
+
+ objects.push({
+  mesh,type,lane:laneChoice
+ });
 }
+
+// GAME START
+
 function startGame(){
- era=+document.getElementById('era').value;
- vehicle=+document.getElementById('vehicle').value;
- // reset scene
- for(let o of [...objects,...decor])scene.remove(o.mesh||o);
- objects=[];decor=[];
- if(chariot)scene.remove(chariot);
- wheels=[];legs=[];horses=[];
+
+ era=Number(document.getElementById('era').value);
+ vehicle=Number(document.getElementById('vehicle').value);
+
+ if(chariot){
+  scene.remove(chariot);
+ }
+
+ objects.forEach(o=>scene.remove(o.mesh));
+ objects=[];
+
+ wheels=[];
+ legs=[];
+ horses=[];
+
  makeEnvironment();
  chariot=makeChariot();
- lane=0;distance=0;score=0;velocity=19;
- playing=true;paused=false;
+
+ lane=0;
+ distance=0;
+ score=0;
+ velocity=19;
+ playing=true;
+ paused=false;
+
  document.getElementById('menu').style.display='none';
+ document.getElementById('menuTitle').textContent='RATHA RACE';
+
  document.getElementById('toast').textContent='THE RACE BEGINS!';
- setTimeout(()=>document.getElementById('toast').textContent='',1500);
+
+ setTimeout(()=>{
+  document.getElementById('toast').textContent='';
+ },1500);
 }
-function steer(d){if(playing&&!paused)lane=Math.max(-1,Math.min(1,lane+d))}
-function pauseGame(){if(playing)paused=!paused}
+
+// CONTROLS
+
+function steer(d){
+ if(playing&&!paused){
+  lane=Math.max(-1,Math.min(1,lane+d));
+ }
+}
+
+function pauseGame(){
+ if(!playing)return;
+
+ paused=!paused;
+
+ document.getElementById('toast').textContent=
+  paused?'GAME PAUSED':'';
+}
+
+// IMPORTANT BUTTON FIX
+
+document.getElementById('startButton')
+.addEventListener('click',startGame);
+
+document.getElementById('pause')
+.addEventListener('click',pauseGame);
+
+// KEYBOARD
+
 addEventListener('keydown',e=>{
- if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')steer(-1);
- if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')steer(1);
- if(e.key==='ArrowUp')velocity=Math.min(34,velocity+1);
- if(e.key==='ArrowDown')velocity=Math.max(8,velocity-2);
- if(e.code==='Space')pauseGame();
+
+ if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')
+  steer(-1);
+
+ if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')
+  steer(1);
+
+ if(e.key==='ArrowUp'&&playing&&!paused)
+  velocity=Math.min(34,velocity+1);
+
+ if(e.key==='ArrowDown'&&playing&&!paused)
+  velocity=Math.max(8,velocity-2);
+
+ if(e.code==='Space')
+  pauseGame();
 });
+
+// MOBILE BUTTONS
+
 function bind(id,fn){
  const el=document.getElementById(id);
- el.addEventListener('pointerdown',e=>{e.preventDefault();fn()});
+
+ el.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  fn();
+ });
 }
-bind('left',()=>steer(-1));bind('right',()=>steer(1));
-bind('gas',()=>velocity=Math.min(34,velocity+2));
-bind('brake',()=>velocity=Math.max(8,velocity-3));
-let clock=new THREE.Clock(),spawnTimer=0;
+
+bind('left',()=>steer(-1));
+bind('right',()=>steer(1));
+
+bind('gas',()=>{
+ if(playing&&!paused)
+  velocity=Math.min(34,velocity+2);
+});
+
+bind('brake',()=>{
+ if(playing&&!paused)
+  velocity=Math.max(8,velocity-3);
+});
+
+// GAME LOOP
+
+const clock=new THREE.Clock();
+let spawnTimer=0;
+
 function update(dt){
+
  if(!playing||paused)return;
+
  distance+=velocity*dt*.75;
  spawnTimer+=dt;
- if(spawnTimer>1.35){spawnTimer=0;spawnObject()}
- // smooth chariot movement
- chariot.position.x+=(lane*3-chariot.position.x)*Math.min(1,dt*5);
- chariot.position.z=3;
- chariot.rotation.z+=( -lane*.07-chariot.rotation.z)*dt*4;
- // animate wheels
- wheels.forEach(w=>w.rotation.x+=dt*velocity*1.7);
- // animate horse legs
- legs.forEach(l=>{
-  l.pivot.rotation.x=Math.sin(clock.elapsedTime*velocity*.65+l.phase)*.48;
- });
- horses.forEach(h=>h.position.y=Math.abs(Math.sin(clock.elapsedTime*velocity*.65))*.045);
- // obstacles and coins
- for(let i=objects.length-1;i>=0;i--){
-  let o=objects[i];o.mesh.position.z+=velocity*dt;
-  if(Math.abs(o.mesh.position.z-3)<2.3&&Math.abs(o.mesh.position.x-chariot.position.x)<1.5){
-   if(o.type==='coin'){score+=10;document.getElementById('toast').textContent='+10 GOLD'}
-   else{velocity=Math.max(8,velocity*.58);document.getElementById('toast').textContent='COLLISION!'}
-   scene.remove(o.mesh);objects.splice(i,1);continue;
-  }
-  if(o.mesh.position.z>12){scene.remove(o.mesh);objects.splice(i,1)}
+
+ if(spawnTimer>1.35){
+  spawnTimer=0;
+  spawnObject();
  }
- document.getElementById('distance').textContent=Math.floor(distance)+' m';
+
+ // CHARIOT MOVEMENT
+
+ chariot.position.x+=
+  (lane*3-chariot.position.x)*Math.min(1,dt*5);
+
+ chariot.position.z=3;
+
+ chariot.rotation.z+=
+  (-lane*.07-chariot.rotation.z)*dt*4;
+
+ // WHEELS
+
+ wheels.forEach(w=>{
+  w.rotation.x+=dt*velocity*1.7;
+ });
+
+ // HORSE ANIMATION
+
+ legs.forEach(l=>{
+  l.pivot.rotation.x=
+   Math.sin(clock.elapsedTime*velocity*.65+l.phase)*.48;
+ });
+
+ horses.forEach(h=>{
+  h.position.y=
+   Math.abs(Math.sin(clock.elapsedTime*velocity*.65))*.045;
+ });
+
+ // COINS AND OBSTACLES
+
+ for(let i=objects.length-1;i>=0;i--){
+
+  let o=objects[i];
+  o.mesh.position.z+=velocity*dt;
+
+  if(
+   Math.abs(o.mesh.position.z-3)<2.3&&
+   Math.abs(o.mesh.position.x-chariot.position.x)<1.5
+  ){
+
+   if(o.type==='coin'){
+    score+=10;
+    document.getElementById('toast').textContent='+10 GOLD';
+   }else{
+    velocity=Math.max(8,velocity*.58);
+    document.getElementById('toast').textContent='COLLISION!';
+   }
+
+   scene.remove(o.mesh);
+   objects.splice(i,1);
+   continue;
+  }
+
+  if(o.mesh.position.z>12){
+   scene.remove(o.mesh);
+   objects.splice(i,1);
+  }
+ }
+
+ // HUD
+
+ document.getElementById('distance').textContent=
+  Math.floor(distance)+' m';
+
  document.getElementById('score').textContent=score;
- document.getElementById('speed').textContent=Math.floor(velocity*5)+' km/h';
+
+ document.getElementById('speed').textContent=
+  Math.floor(velocity*5)+' km/h';
+
+ // FINISH
+
  if(distance>2000){
+
   playing=false;
+
   document.getElementById('menu').style.display='flex';
-  document.querySelector('#menu h1').textContent='VICTORY!';
-  document.querySelector('#menu .sub').innerHTML='Race complete!<br>Distance: '+Math.floor(distance)+' m<br>Gold collected: '+score;
+
+  document.getElementById('menuTitle').textContent='VICTORY!';
+
+  document.getElementById('menuSubtitle').innerHTML=
+   'RACE COMPLETE!<br>Distance: '+
+   Math.floor(distance)+' m<br>Gold collected: '+score;
+
+  document.getElementById('startButton').textContent=
+   'RACE AGAIN';
  }
 }
+
+// RENDER
+
 function render(){
+
  requestAnimationFrame(render);
- let dt=Math.min(clock.getDelta(),.05);
+
+ const dt=Math.min(clock.getDelta(),.05);
+
  update(dt);
+
  if(chariot){
-  const target=new THREE.Vector3(chariot.position.x*.45,5.0,10.5);
-  camera.position.lerp(target,1-Math.exp(-dt*3));
-  camera.lookAt(chariot.position.x*.3,1.1,-9);
+
+  const target=new THREE.Vector3(
+   chariot.position.x*.45,5.0,10.5
+  );
+
+  camera.position.lerp(
+   target,1-Math.exp(-dt*3)
+  );
+
+  camera.lookAt(
+   chariot.position.x*.3,1.1,-9
+  );
  }
+
  renderer.render(scene,camera);
 }
+
 render();
+
+// RESIZE
+
 addEventListener('resize',()=>{
- camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
  renderer.setSize(innerWidth,innerHeight);
 });
+
 </script>
 </body>
 </html>
